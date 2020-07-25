@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using System.Reflection;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -13,19 +10,10 @@ using DSharp​Plus.Interactivity;
 
 namespace MayoiBot
 {
+    [Group("Commands")]
+    [Description("Commands for everyone")]
     public class Commands
     {
-        static string GetMethodsUsingReflection()
-            {
-                MethodInfo[] methodInfos = typeof(Commands).GetMethods();
-                    string strarr = "";
-                    // writes all the property names                    
-                    foreach (var mi in Program.commands.RegisteredCommands)
-                    {
-                        strarr += config.prefix() + mi.Value + "\n";
-                    }
-                    return strarr;
-            }
         [Command("hi")]
         [Description("Gives a hearty hello!")]
             public async Task Hi(CommandContext ctx)
@@ -58,18 +46,11 @@ namespace MayoiBot
                 var number = new Random();
                 await ctx.Channel.SendMessageAsync("Returned: " + number.Next(min, max));
             }
-        [Command("cmds")]
-        [Aliases("commands", "cmd")]
-        [Description("Returns all the available commands")]
-            public async Task Cmds(CommandContext ctx)
+            static string eitherNR(int x)
             {
-                await ctx.Channel.SendMessageAsync(GetMethodsUsingReflection());
+                string[] arr = {" is not very smart!", " is very smart!"};
+                return arr[x];
             }
-        static string eitherNR(int x)
-                {
-                    string[] arr = {" is not very smart!", " is very smart!"};
-                    return arr[x];
-                }
         [Command("smart")]
             public async Task Smart(CommandContext ctx, string Mention) // Mention isnt any string. Not just mentions. Help.
             {
@@ -106,38 +87,6 @@ namespace MayoiBot
                     Description = 
                     member.Mention +
                     "\nUser Name: " + member.Username + " #" + member.Discriminator +
-                    "\nUser Created: " + member.CreationTimestamp +
-                    "\nID: " + member.Id +
-                    "\nVerification: " + member.Verified +
-                    "\nPresence: " + member.Presence?.Status + " | " + member.Presence?.Game?.Name + " `" + member.Presence?.Game?.Details + "`"
-                };
-                await ctx.Channel.SendMessageAsync(embed: emb);
-            }
-            catch (Exception exc) 
-            {
-                Console.WriteLine(exc);
-            }
-        }
-    }
-    public class Mod_Commands
-    {
-        [Command("userinfo")]
-        [Aliases("uinfo")]
-        [RequireUserPermissions(Permissions.Administrator)]
-        public async Task UserInfo (CommandContext ctx, DiscordMember member = null)
-        {   
-            if (member is null) {member = ctx.Member;}
-            try 
-            {
-                var emb = new DiscordEmbedBuilder
-                {
-                    Color = DiscordColor.Gold,
-                    Title = "User info of: " + member.Username,
-                    ThumbnailUrl = member.AvatarUrl,
-                    Description = 
-                    "Displayname: " + member.DisplayName +
-                    "\nGuildOwner: " + member.Guild?.IsOwner +
-                    "\nJoin Date: " + member.JoinedAt +
                     "\nUser Created: " + member.CreationTimestamp +
                     "\nID: " + member.Id +
                     "\nVerification: " + member.Verified +

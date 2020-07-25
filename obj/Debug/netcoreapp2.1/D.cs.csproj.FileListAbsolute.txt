@@ -9,3 +9,14 @@
 /home/ole/D.cs/obj/Debug/netcoreapp2.1/D.cs.AssemblyInfo.cs
 /home/ole/D.cs/obj/Debug/netcoreapp2.1/D.cs.dll
 /home/ole/D.cs/obj/Debug/netcoreapp2.1/D.cs.pdb
+/home/ole/Mayoi-Onee-san/bin/Debug/netcoreapp2.1/D.cs.deps.json
+/home/ole/Mayoi-Onee-san/bin/Debug/netcoreapp2.1/D.cs.runtimeconfig.json
+/home/ole/Mayoi-Onee-san/bin/Debug/netcoreapp2.1/D.cs.runtimeconfig.dev.json
+/home/ole/Mayoi-Onee-san/bin/Debug/netcoreapp2.1/D.cs.dll
+/home/ole/Mayoi-Onee-san/bin/Debug/netcoreapp2.1/D.cs.pdb
+/home/ole/Mayoi-Onee-san/obj/Debug/netcoreapp2.1/D.cs.csprojAssemblyReference.cache
+/home/ole/Mayoi-Onee-san/obj/Debug/netcoreapp2.1/D.cs.csproj.CoreCompileInputs.cache
+/home/ole/Mayoi-Onee-san/obj/Debug/netcoreapp2.1/D.cs.AssemblyInfoInputs.cache
+/home/ole/Mayoi-Onee-san/obj/Debug/netcoreapp2.1/D.cs.AssemblyInfo.cs
+/home/ole/Mayoi-Onee-san/obj/Debug/netcoreapp2.1/D.cs.dll
+/home/ole/Mayoi-Onee-san/obj/Debug/netcoreapp2.1/D.cs.pdb

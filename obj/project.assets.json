@@ -5907,11 +5907,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/ole/D.cs/D.cs.csproj",
+      "projectUniqueName": "/home/ole/Mayoi-Onee-san/D.cs.csproj",
       "projectName": "D.cs",
-      "projectPath": "/home/ole/D.cs/D.cs.csproj",
+      "projectPath": "/home/ole/Mayoi-Onee-san/D.cs.csproj",
       "packagesPath": "/home/ole/.nuget/packages/",
-      "outputPath": "/home/ole/D.cs/obj/",
+      "outputPath": "/home/ole/Mayoi-Onee-san/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "/usr/share/dotnet/sdk/NuGetFallbackFolder"

@@ -36,6 +36,7 @@ namespace MayoiBot
             });
 
             commands.RegisterCommands<Commands>();
+            commands.RegisterCommands<Mod_Commands>();
             
             await discord.ConnectAsync();
             await Task.Delay(-1);
