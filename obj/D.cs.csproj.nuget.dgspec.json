@@ -17,6 +17,7 @@
           "/usr/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
+          "/home/ole/Mayoi-Onee-san/NuGet.Config",
           "/home/ole/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
@@ -24,7 +25,7 @@
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {},
-          "https://www.myget.org/F/dsharpplus-nightly/api/v3/index.json": {}
+          "https://nuget.emzi0767.com/api/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp2.1": {
@@ -42,17 +43,22 @@
           "dependencies": {
             "DSharpPlus": {
               "target": "Package",
-              "version": "[3.2.3, )"
+              "version": "[4.0.0-nightly-00709, )"
             },
             "DSharpPlus.CommandsNext": {
               "target": "Package",
-              "version": "[3.2.3, )"
+              "version": "[4.0.0-nightly-00709, )"
             },
             "DSharpPlus.Interactivity": {
               "target": "Package",
-              "version": "[3.2.3, )"
+              "version": "[4.0.0-nightly-00709, )"
+            },
+            "DSharpPlus.VoiceNext": {
+              "target": "Package",
+              "version": "[4.0.0-nightly-00709, )"
             },
             "Microsoft.NETCore.App": {
+              "suppressParent": "All",
               "target": "Package",
               "version": "[2.1.0, )",
               "autoReferenced": true

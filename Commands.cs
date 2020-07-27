@@ -1,21 +1,22 @@
 using System;
+using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
-using DSharpPlus.EventArgs;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharp​Plus.Entities;
-using DSharp​Plus.Interactivity;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Entities;
+using DSharpPlus.Interactivity.EventHandling;
 
 namespace MayoiBot
 {
-    [Group("Commands")]
-    [Description("Commands for everyone")]
-    public class Commands
+    [Category("Commands")]
+    [DSharpPlus.CommandsNext.Attributes.Description("Commands for everyone")]
+    public class Commands : BaseCommandModule
     {
         [Command("hi")]
-        [Description("Gives a hearty hello!")]
+        [DSharpPlus.CommandsNext.Attributes.Description("Gives a hearty hello!")]
             public async Task Hi(CommandContext ctx)
             {
                 await ctx.RespondAsync($"👋 Hi, {ctx.User.Mention}!\n{ctx.User.AvatarUrl}");
@@ -23,12 +24,10 @@ namespace MayoiBot
         [Command("info")]
             public async Task Info(CommandContext ctx)
             {
-                string infostring = ctx.Client.CurrentUser.Username + " bot info:";
-
                 var builder = new DiscordEmbedBuilder
                 {
                     Color = DiscordColor.White,
-                    Title = infostring,
+                    Title = ctx.Client.CurrentUser.Username + " bot info:",
                     Description = "This bot is open source and available [here](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!"
                 };
                 
@@ -36,7 +35,7 @@ namespace MayoiBot
                 builder.AddField(".NET wrapper", "[D#+](https://github.com/DSharpPlus/DSharpPlus/ 'DSharpPlus')", true);
                 builder.AddField("Author", "Cata", true);
                 builder.WithImageUrl("https://dsharpplus.emzi0767.com/logo.png");
-                builder.WithThumbnailUrl("https://cdn.discordapp.com/attachments/717045059215687691/735462333786095626/C_Sharp_logo.png");
+                builder.WithThumbnail("https://cdn.discordapp.com/attachments/717045059215687691/735462333786095626/C_Sharp_logo.png");
                 
                 await ctx.RespondAsync(embed: builder);
             }
@@ -46,57 +45,92 @@ namespace MayoiBot
                 var number = new Random();
                 await ctx.Channel.SendMessageAsync("Returned: " + number.Next(min, max));
             }
-            static string eitherNR(int x)
+
+            private static string EitherNr(int x)
             {
                 string[] arr = {" is not very smart!", " is very smart!"};
                 return arr[x];
             }
         [Command("smart")]
-            public async Task Smart(CommandContext ctx, string Mention) // Mention isnt any string. Not just mentions. Help.
+            public async Task Smart(CommandContext ctx, DiscordMember member) // Mention isnt any string. Not just mentions. Help.
             {
-                var rndm = new Random();
-                int YN = rndm.Next(0, 101);
-                if (YN >= 50) { YN = 1;}
-                else { YN = 0; }  
-                await ctx.Channel.SendMessageAsync(Mention + eitherNR(YN));               
+                try
+                {
+                    var rndm = new Random();
+                    var yn = rndm.Next(0, 101);
+                    if (yn >= 50)
+                    {
+                        yn = 1;
+                    }
+                    else
+                    {
+                        yn = 0; }
+                    await ctx.Channel.SendMessageAsync(member.Mention + EitherNr(yn));          
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }     
             }
         [Command("8ball")]
-            public async Task EightBall (CommandContext ctx, string args)
+            public async Task EightBall (CommandContext ctx, [RemainingText]string args)
             {
-                string[] EBArray = 
+                string[] ebArray = 
                 {
                     "It is certainly possible!", "Yes, I believe so!", "Maybe...",
                     "I hope not!", "Yes... Maybe?", "Do you actually think that is possible??",
                     "I pity you for even asking."
                 };
-                var RNDM = new Random();
-                int nmbr = RNDM.Next(0, EBArray.Length);
-                await ctx.Channel.SendMessageAsync(EBArray[nmbr]);
+                var rndm = new Random();
+                var nmbr = rndm.Next(0, ebArray.Length);
+                await ctx.Channel.SendMessageAsync(ebArray[nmbr]);
             }
         [Command("user")]
         public async Task User (CommandContext ctx, DiscordUser member = null)
         {   
-            if (member is null) {member = ctx.User;}
+            if (member is null) { member = ctx.User; }
             try 
             {
                 var emb = new DiscordEmbedBuilder
                 {
                     Color = DiscordColor.Gold,
                     Title = "User info of: " + member.Username,
-                    ThumbnailUrl = member.AvatarUrl,
+                    ImageUrl = member.AvatarUrl,
                     Description = 
                     member.Mention +
-                    "\nUser Name: " + member.Username + " #" + member.Discriminator +
+                    "\nUser Name: " + member.Username + "#" + member.Discriminator +
                     "\nUser Created: " + member.CreationTimestamp +
                     "\nID: " + member.Id +
-                    "\nVerification: " + member.Verified +
-                    "\nPresence: " + member.Presence?.Status + " | " + member.Presence?.Game?.Name + " `" + member.Presence?.Game?.Details + "`"
+                    "\nVerification: (?) " + member.Verified +
+                    "\nPresence: " + member.Presence?.Status + " | `" + member.Presence?.Activity?.Name + "` `" + member.Presence?.Activity?.CustomStatus +
+                    " `\nAdditional: (?) `" + member.Presence?.Activity?.RichPresence?.Application?.Name + " `:` " + member.Presence?.Activity?.RichPresence?.Details +
+                    " `\nStreaming: (?) " + member.Presence?.Activity?.StreamUrl
                 };
                 await ctx.Channel.SendMessageAsync(embed: emb);
             }
             catch (Exception exc) 
             {
                 Console.WriteLine(exc);
+            }
+        }
+        [Command("tictactoe")]
+        [Aliases("ttt")]
+        public async Task TicTacToe(CommandContext ctx, DiscordMember member)
+        {
+            try
+            {
+                var interactivity = ctx.Client.GetInteractivity();
+                var x = await ctx.RespondAsync(embed: MayoiBot.Embeds.TttEmbed);
+                await x.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":eyes:"));
+                var y = await interactivity.WaitForReactionAsync(x, ctx.User, TimeSpan.FromSeconds(25));
+                await ctx.RespondAsync(y.Result?.Emoji);
+            }
+            catch (Exception e)
+            {
+                await ctx.RespondAsync(e.Message + "\n" + e.StackTrace);
+                Console.WriteLine(e);
+                
             }
         }
     }

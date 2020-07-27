@@ -2,16 +2,13 @@
 using System;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
-using System.Collections.Generic;
-using System.Text;
-using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
 
 namespace MayoiBot
 {
     class Program
     {
-        public static CommandsNextModule commands;
+        public static CommandsNextExtension commands;
         static DiscordClient discord;
 
         static void Main(string[] args)
@@ -30,19 +27,20 @@ namespace MayoiBot
             });
             commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
-            StringPrefix = config.prefix(),
+            StringPrefixes = new[]{"-"},
             CaseSensitive = false,
             EnableDms = false
             });
 
             commands.RegisterCommands<Commands>();
-            commands.RegisterCommands<Mod_Commands>();
+            commands.RegisterCommands<Moderation>();
+
             
             await discord.ConnectAsync();
             await Task.Delay(-1);
         }
 
-        static InteractivityModule interactivity; 
+        static InteractivityExtension interactivity; 
 
     }
 }
