@@ -78,6 +78,15 @@
           }
         }
       },
+      "DSharpPlus.WebSocket.WebSocketSharp/4.0.0-nightly-00653": {
+        "type": "package",
+        "compile": {
+          "lib/net45/DSharpPlus.WebSocket.WebSocketSharp.dll": {}
+        },
+        "runtime": {
+          "lib/net45/DSharpPlus.WebSocket.WebSocketSharp.dll": {}
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/1.1.0": {
         "type": "package",
         "compile": {
@@ -1471,6 +1480,18 @@
         "runtimes/win-x64/native/libsodium.dll",
         "runtimes/win-x86/native/libopus.dll",
         "runtimes/win-x86/native/libsodium.dll"
+      ]
+    },
+    "DSharpPlus.WebSocket.WebSocketSharp/4.0.0-nightly-00653": {
+      "sha512": "xOp8NZAYSK0PvS+lZ7KmHfWxaSBbTM+eArhcOPi2ESKsQww7hk4LD54y3uHRawT5CW2UOljnIQ2JF9N9M/zHIA==",
+      "type": "package",
+      "path": "dsharpplus.websocket.websocketsharp/4.0.0-nightly-00653",
+      "files": [
+        ".nupkg.metadata",
+        "dsharpplus.websocket.websocketsharp.4.0.0-nightly-00653.nupkg.sha512",
+        "dsharpplus.websocket.websocketsharp.nuspec",
+        "lib/net45/DSharpPlus.WebSocket.WebSocketSharp.dll",
+        "lib/net45/DSharpPlus.WebSocket.WebSocketSharp.xml"
       ]
     },
     "Microsoft.Bcl.AsyncInterfaces/1.1.0": {
@@ -4707,6 +4728,7 @@
       "DSharpPlus.CommandsNext >= 4.0.0-nightly-00709",
       "DSharpPlus.Interactivity >= 4.0.0-nightly-00709",
       "DSharpPlus.VoiceNext >= 4.0.0-nightly-00709",
+      "DSharpPlus.WebSocket.WebSocketSharp >= 4.0.0-nightly-00653",
       "Microsoft.NETCore.App >= 2.1.0"
     ]
   },
@@ -4767,6 +4789,10 @@
             "target": "Package",
             "version": "[4.0.0-nightly-00709, )"
           },
+          "DSharpPlus.WebSocket.WebSocketSharp": {
+            "target": "Package",
+            "version": "[4.0.0-nightly-00653, )"
+          },
           "Microsoft.NETCore.App": {
             "suppressParent": "All",
             "target": "Package",
@@ -4775,11 +4801,29 @@
           }
         },
         "imports": [
-          "net461"
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.302/RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'DSharpPlus.WebSocket.WebSocketSharp 4.0.0-nightly-00653' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
+      "libraryId": "DSharpPlus.WebSocket.WebSocketSharp",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.1"
+      ]
+    }
+  ]
 }

@@ -6,10 +6,11 @@ using DSharpPlus.Interactivity;
 
 namespace MayoiBot
 {
-    class Program
+    public class Program
     {
-        public static CommandsNextExtension commands;
-        static DiscordClient discord;
+        public static CommandsNextExtension Commands { get; private set; }
+        public InteractivityExtension Interactivity { get; private set; } 
+        public static DiscordClient Discord { get; private set; }
 
         static void Main(string[] args)
         {
@@ -18,29 +19,30 @@ namespace MayoiBot
         static async Task MainAsync(string[] args)
         {
             Console.WriteLine("Boot finished");
-            discord = new DiscordClient(new DiscordConfiguration
+            Discord = new DiscordClient(new DiscordConfiguration
             {
                 Token = config.token(),
                 TokenType = TokenType.Bot,
                 UseInternalLogHandler = true,
                 LogLevel = LogLevel.Debug
             });
-            commands = discord.UseCommandsNext(new CommandsNextConfiguration
+            Commands = Discord.UseCommandsNext(new CommandsNextConfiguration
             {
             StringPrefixes = new[]{"-"},
             CaseSensitive = false,
             EnableDms = false
             });
 
-            commands.RegisterCommands<Commands>();
-            commands.RegisterCommands<Moderation>();
+            Commands.RegisterCommands<Commands>();
+            Commands.RegisterCommands<Moderation>();
 
+            Discord.UseInteractivity(new InteractivityConfiguration
+            {
+                Timeout = TimeSpan.FromMinutes(2)
+            });
             
-            await discord.ConnectAsync();
+            await Discord.ConnectAsync();
             await Task.Delay(-1);
         }
-
-        static InteractivityExtension interactivity; 
-
     }
 }
