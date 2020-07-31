@@ -21,6 +21,8 @@ namespace MayoiBot
 {
     [Category("Commands")]
     [DSharpPlus.CommandsNext.Attributes.Description("Commands for everyone")]
+    [Cooldown(1, 10, CooldownBucketType.Guild)]
+
     public class Commands : BaseCommandModule
     {
         [Command("hi")]
@@ -139,20 +141,21 @@ namespace MayoiBot
             var circle = DiscordEmoji.FromName(ctx.Client, ":o:");
             var cross = DiscordEmoji.FromName(ctx.Client, ":x:");
             var agree = DiscordEmoji.FromName(ctx.Client, ":+1:");
-            var disagree = DiscordEmoji.FromName(ctx.Client, ":-1:");
+            var disagree = DiscordEmoji.FromName(ctx.Client, ":-1:"); 
+            Embeds.TttEmbed.WithDescription(member.Mention + " react with a 👍 to start game! Or 👎 to cancel.");
             var x = await ctx.RespondAsync(embed: Embeds.TttEmbed);
             await x.CreateReactionAsync(agree).ConfigureAwait(false);
             await x.CreateReactionAsync(disagree).ConfigureAwait(false);
 
             var msg = x;
-            var y = await msg.WaitForReactionAsync(ctx.User, TimeSpan.FromSeconds(45));
+            var y = await msg.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
             var res = y;
             if (res.Result?.Emoji == agree)
             {
                 await x.DeleteAllReactionsAsync();
                 await x.ModifyAsync(
-                    "Let's begin!\n" + 
-                    circle + " represents: " + member.Mention + "\n" +
+                    "Let's begin!\nType numbers 1-9 to make a move\n" + 
+                    circle + " represents: " + member.Mention + " (This player begins)\n" +
                     cross + " represents: " + ctx.Member.Mention,
                     embed: null);
                 await TTT(ctx, member);

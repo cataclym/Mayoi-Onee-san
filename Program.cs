@@ -28,9 +28,9 @@ namespace MayoiBot
             });
             Commands = Discord.UseCommandsNext(new CommandsNextConfiguration
             {
-            StringPrefixes = new[]{"-"},
-            CaseSensitive = false,
-            EnableDms = false
+                StringPrefixes = new[]{"-"},
+                CaseSensitive = false,
+                EnableDms = false
             });
 
             Commands.RegisterCommands<Commands>();
