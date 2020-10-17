@@ -1,8 +1,11 @@
 ﻿using DSharpPlus;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 
 namespace MayoiBot
 {
@@ -21,10 +24,8 @@ namespace MayoiBot
             Console.WriteLine("Boot finished");
             Discord = new DiscordClient(new DiscordConfiguration
             {
-                Token = config.token(),
+                Token = config.Token(),
                 TokenType = TokenType.Bot,
-                UseInternalLogHandler = true,
-                LogLevel = LogLevel.Debug
             });
             Commands = Discord.UseCommandsNext(new CommandsNextConfiguration
             {
@@ -41,7 +42,15 @@ namespace MayoiBot
                 Timeout = TimeSpan.FromMinutes(2)
             });
             
-            await Discord.ConnectAsync();
+            var activity = new DiscordActivity
+            {
+                Name = "Ara Ara~",
+                ActivityType = ActivityType.Streaming,
+                StreamUrl = "https://discord.com/invite/UuASJCD"
+            };
+            //await Discord.UpdateStatusAsync(activity: activity, userStatus: UserStatus.Idle);
+            
+            await Discord.ConnectAsync(activity);
             await Task.Delay(-1);
         }
     }

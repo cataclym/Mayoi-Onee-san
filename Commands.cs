@@ -14,6 +14,7 @@ using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity.EventHandling;
+using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Net.WebSocket;
 using DSharpPlus.Net;
 
@@ -21,7 +22,7 @@ namespace MayoiBot
 {
     [Category("Commands")]
     [DSharpPlus.CommandsNext.Attributes.Description("Commands for everyone")]
-    [Cooldown(1, 10, CooldownBucketType.Guild)]
+    [Cooldown(2, 4, CooldownBucketType.Guild)]
 
     public class Commands : BaseCommandModule
     {
@@ -54,7 +55,7 @@ namespace MayoiBot
         }
 
         [Command("random")]
-        public async Task Random(CommandContext ctx, int min, int max)
+        public async Task Random(CommandContext ctx, int min = 0, int max = 100)
         {
             var number = new Random();
             await ctx.Channel.SendMessageAsync("Returned: " + number.Next(min, max));
@@ -68,10 +69,11 @@ namespace MayoiBot
 
         [Command("smart")]
         public async Task
-            Smart(CommandContext ctx, DiscordMember member) // Mention isnt any string. Not just mentions. Help.
+            Smart(CommandContext ctx, DiscordMember member = null) // Mention isnt any string. Not just mentions. Help.
         {
             try
             {
+                member ??= ctx.Member;  
                 var rndm = new Random();
                 var yn = rndm.Next(0, 101);
                 if (yn >= 50)
@@ -82,7 +84,6 @@ namespace MayoiBot
                 {
                     yn = 0;
                 }
-
                 await ctx.Channel.SendMessageAsync(member.Mention + EitherNr(yn));
             }
             catch (Exception e)
@@ -105,32 +106,31 @@ namespace MayoiBot
             var nmbr = rndm.Next(0, ebArray.Length);
             await ctx.Channel.SendMessageAsync(ebArray[nmbr]);
         }
-
-        [Command("user")]
-        public async Task User(CommandContext ctx, DiscordUser member = null)
-        {
-            if (member is null)
-            {
-                member = ctx.User;
-            } 
-            var emb = new DiscordEmbedBuilder 
+        [Command("userinfo")]
+        [Aliases("uinfo")]
+        public async Task UserInfo (CommandContext ctx, DiscordMember member = null)
+        {   
+            member ??= ctx.Member;
+            var userImage = new DiscordEmbedBuilder.EmbedThumbnail {Url = member.AvatarUrl};
+            var emb = new DiscordEmbedBuilder
             {
                 Color = DiscordColor.Gold,
-                Title = "User info of: " + member.Username,
-                ImageUrl = member.AvatarUrl,
-                Description =
-                    member.Mention +
-                    "\nUser Name: " + member.Username + "#" + member.Discriminator +
-                    "\nUser Created: " + member.CreationTimestamp +
-                    "\nID: " + member.Id +
-                    "\nVerification: (?) " + member.Verified +
-                    "\nPresence: " + member.Presence?.Status + " | `" + member.Presence?.Activity?.Name + "` `" +
-                    member.Presence?.Activity?.CustomStatus +
-                    " `\nAdditional: (?) `" + member.Presence?.Activity?.RichPresence?.Application?.Name + " `:` " +
-                    member.Presence?.Activity?.RichPresence?.Details +
-                    " `\nStreaming: (?) " + member.Presence?.Activity?.StreamUrl
+                Title = "User info of " + member.Username,
+                Thumbnail = userImage
             };
-        await ctx.Channel.SendMessageAsync(embed: emb);
+            emb.AddField("Displayname", "**" + member.DisplayName + "**#" + member.Discriminator, true);
+            emb.AddField("GuildOwner", $"{member.IsOwner}", true);
+            emb.AddField("ID",$"{member.Id}", true);
+            emb.AddField("Join Date", $"{member.JoinedAt}", true);
+            emb.AddField("User Created", $"{member.CreationTimestamp}", true);
+            emb.AddField("Verification", "(?) " + $"{member.Verified}", true);
+            emb.AddField("Presence", "(?) " +$"{member.Presence?.Status}\n" +
+                                     $"{member.Presence?.Activity?.Name}\n" +
+                                     $"{member.Presence?.Activity?.RichPresence?.Application?.Name}\n" +
+                                     $"{member.Presence?.Activity?.CustomStatus?.Emoji} {member.Presence?.Activity?.CustomStatus?.Name}", true);
+            emb.AddField("RichPresence", "(?) " + $"{member.Presence?.Activity?.RichPresence?.Details}", true);
+            emb.AddField("Streaming", "(?) " + $"{member.Presence?.Activity?.StreamUrl}", true);
+            await ctx.Channel.SendMessageAsync(embed: emb);
         }
 
         [Command("tictactoe")]
@@ -142,15 +142,13 @@ namespace MayoiBot
             var cross = DiscordEmoji.FromName(ctx.Client, ":x:");
             var agree = DiscordEmoji.FromName(ctx.Client, ":+1:");
             var disagree = DiscordEmoji.FromName(ctx.Client, ":-1:"); 
-            Embeds.TttEmbed.WithDescription(member.Mention + " react with a 👍 to start game! Or 👎 to cancel.");
             var x = await ctx.RespondAsync(embed: Embeds.TttEmbed);
+            Embeds.TttEmbed.WithDescription(member.Mention + " react with a 👍 to start game! Or 👎 to cancel.");
             await x.CreateReactionAsync(agree).ConfigureAwait(false);
             await x.CreateReactionAsync(disagree).ConfigureAwait(false);
 
-            var msg = x;
-            var y = await msg.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
-            var res = y;
-            if (res.Result?.Emoji == agree)
+            var y = await x.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
+            if (y.Result?.Emoji == agree)
             {
                 await x.DeleteAllReactionsAsync();
                 await x.ModifyAsync(
@@ -160,7 +158,7 @@ namespace MayoiBot
                     embed: null);
                 await TTT(ctx, member);
             }
-            else if (res.Result?.Emoji == disagree)
+            else if (y.Result?.Emoji == disagree)
             {
                 await x.DeleteAllReactionsAsync();
                 await x.ModifyAsync(embed: Embeds.Cancelled);

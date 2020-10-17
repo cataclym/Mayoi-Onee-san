@@ -1,11 +1,7 @@
 public class config
 {
-    public static string token()
+    public static string Token()
     {
         return "";
-    }
-    public static string prefix()
-    {
-        return "-";
     }
 }   
