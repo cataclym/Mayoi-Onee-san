@@ -11,11 +11,11 @@ namespace MayoiBot
 {
     public class Program
     {
-        public static CommandsNextExtension Commands { get; private set; }
-        public InteractivityExtension Interactivity { get; private set; } 
-        public static DiscordClient Discord { get; private set; }
+        private static CommandsNextExtension Commands { get; set; }
+        public InteractivityExtension Interactivity { get; private set; }
+        private static DiscordClient Discord { get; set; }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
         }
@@ -46,11 +46,9 @@ namespace MayoiBot
             {
                 Name = "Ara Ara~",
                 ActivityType = ActivityType.Streaming,
-                StreamUrl = "https://discord.com/invite/UuASJCD"
+                StreamUrl = "https://discord.com/invite/UuASJCD",
             };
-            //await Discord.UpdateStatusAsync(activity: activity, userStatus: UserStatus.Idle);
-            
-            await Discord.ConnectAsync(activity);
+            await Discord.ConnectAsync(activity, UserStatus.Idle, DateTimeOffset.Now);
             await Task.Delay(-1);
         }
     }

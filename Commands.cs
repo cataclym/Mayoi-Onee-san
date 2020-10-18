@@ -2,21 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
-using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using DSharpPlus.Interactivity.EventHandling;
 using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Net.WebSocket;
-using DSharpPlus.Net;
 
 namespace MayoiBot
 {
@@ -30,7 +22,7 @@ namespace MayoiBot
         [DSharpPlus.CommandsNext.Attributes.Description("Gives a hearty hello!")]
         public async Task Hi(CommandContext ctx)
         {
-            await ctx.RespondAsync($"👋 Hi, {ctx.User.Mention}!\n{ctx.User.AvatarUrl}");
+            await ctx.RespondAsync($"👋 Hi, {ctx.User.Mention}!");
         }
 
         [Command("info")]
@@ -41,7 +33,7 @@ namespace MayoiBot
                 Color = DiscordColor.White,
                 Title = ctx.Client.CurrentUser.Username + " bot info:",
                 Description =
-                    "This bot is open source and available [here](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!"
+                    "This bot is open source and available on [GitHub](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!"
             };
 
             builder.AddField("Language", "C#", true);
@@ -69,32 +61,17 @@ namespace MayoiBot
 
         [Command("smart")]
         public async Task
-            Smart(CommandContext ctx, DiscordMember member = null) // Mention isnt any string. Not just mentions. Help.
+            Smart(CommandContext ctx, DiscordMember member = null)
         {
-            try
-            {
-                member ??= ctx.Member;  
-                var rndm = new Random();
-                var yn = rndm.Next(0, 101);
-                if (yn >= 50)
-                {
-                    yn = 1;
-                }
-                else
-                {
-                    yn = 0;
-                }
+            member ??= ctx.Member;  
+                var randomNumber = new Random();
+                int yn = randomNumber.Next(0, 101);
+                yn = yn >= 50 ? 1 : 0;
                 await ctx.Channel.SendMessageAsync(member.Mention + EitherNr(yn));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
         }
 
         [Command("8ball")]
-        public async Task EightBall(CommandContext ctx, [RemainingText] string args)
+        public async Task EightBall(CommandContext ctx, [RemainingText] string arg)
         {
             string[] ebArray =
             {
@@ -102,23 +79,22 @@ namespace MayoiBot
                 "I hope not!", "Yes... Maybe?", "Do you actually think that is possible??",
                 "I pity you for even asking."
             };
-            var rndm = new Random();
-            var nmbr = rndm.Next(0, ebArray.Length);
-            await ctx.Channel.SendMessageAsync(ebArray[nmbr]);
+            var randomNumber = new Random();
+            int number = randomNumber.Next(0, ebArray.Length);
+            await ctx.Channel.SendMessageAsync(ebArray[number]);
         }
         [Command("userinfo")]
         [Aliases("uinfo")]
         public async Task UserInfo (CommandContext ctx, DiscordMember member = null)
         {   
             member ??= ctx.Member;
-            var userImage = new DiscordEmbedBuilder.EmbedThumbnail {Url = member.AvatarUrl};
             var emb = new DiscordEmbedBuilder
             {
                 Color = DiscordColor.Gold,
-                Title = "User info of " + member.Username,
-                Thumbnail = userImage
+                Title = "User info of **" + member.Username + "**#" + member.Discriminator,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail {Url = member.AvatarUrl}
             };
-            emb.AddField("Displayname", "**" + member.DisplayName + "**#" + member.Discriminator, true);
+            emb.AddField("Displayname", member.DisplayName, true);
             emb.AddField("GuildOwner", $"{member.IsOwner}", true);
             emb.AddField("ID",$"{member.Id}", true);
             emb.AddField("Join Date", $"{member.JoinedAt}", true);
@@ -138,16 +114,16 @@ namespace MayoiBot
 
         public async Task TicTacToe(CommandContext ctx, DiscordMember member)
         {
-            var circle = DiscordEmoji.FromName(ctx.Client, ":o:");
-            var cross = DiscordEmoji.FromName(ctx.Client, ":x:");
-            var agree = DiscordEmoji.FromName(ctx.Client, ":+1:");
-            var disagree = DiscordEmoji.FromName(ctx.Client, ":-1:"); 
-            var x = await ctx.RespondAsync(embed: Embeds.TttEmbed);
+            DiscordEmoji circle = DiscordEmoji.FromName(ctx.Client, ":o:");
+            DiscordEmoji cross = DiscordEmoji.FromName(ctx.Client, ":x:");
+            DiscordEmoji agree = DiscordEmoji.FromName(ctx.Client, ":+1:");
+            DiscordEmoji disagree = DiscordEmoji.FromName(ctx.Client, ":-1:"); 
+            DiscordMessage x = await ctx.RespondAsync(embed: Embeds.TttEmbed);
             Embeds.TttEmbed.WithDescription(member.Mention + " react with a 👍 to start game! Or 👎 to cancel.");
             await x.CreateReactionAsync(agree).ConfigureAwait(false);
             await x.CreateReactionAsync(disagree).ConfigureAwait(false);
 
-            var y = await x.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
+            InteractivityResult<MessageReactionAddEventArgs> y = await x.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
             if (y.Result?.Emoji == agree)
             {
                 await x.DeleteAllReactionsAsync();
@@ -170,24 +146,22 @@ namespace MayoiBot
             }
         }
 
-        private async Task TTT(CommandContext ctx, SnowflakeObject member)
+        private static async Task TTT(CommandContext ctx, SnowflakeObject member)
         {
-            try
-            {
-                bool isAuthorTurn = false;
+            var isAuthorTurn = false;
                 var moves = new List<int>();
-                var interactivity = ctx.Client.GetInteractivity();
-                var placeholder = DiscordEmoji.FromName(ctx.Client, ":white_large_square:");
-                var circle = DiscordEmoji.FromName(ctx.Client, ":o:");
-                var cross = DiscordEmoji.FromName(ctx.Client, ":x:");
-                var tic = await ctx.Channel.SendMessageAsync(
+                InteractivityExtension interactivity = ctx.Client.GetInteractivity();
+                DiscordEmoji placeholder = DiscordEmoji.FromName(ctx.Client, ":white_large_square:");
+                DiscordEmoji circle = DiscordEmoji.FromName(ctx.Client, ":o:");
+                DiscordEmoji cross = DiscordEmoji.FromName(ctx.Client, ":x:");
+                DiscordMessage tic = await ctx.Channel.SendMessageAsync(
                     placeholder + placeholder + placeholder + "\n" +
                     placeholder + placeholder + placeholder + "\n" +
                     placeholder + placeholder + placeholder
                 );
-                object[] arr = new object[tic.Content.Length];
-                int i = 0;
-                foreach (var chr in tic.Content)
+                var arr = new object[tic.Content.Length];
+                var i = 0;
+                foreach (char chr in tic.Content)
                 {
                     arr.SetValue(chr, i);
                     i++;
@@ -195,7 +169,7 @@ namespace MayoiBot
                 await Inputs();
                 async Task Inputs()
                 {
-                    var response = await interactivity.WaitForMessageAsync(
+                    InteractivityResult<DiscordMessage> response = await interactivity.WaitForMessageAsync(
                         x => x.Channel == ctx.Message.Channel &&
                              (x.Author.Id == ctx.Member.Id || x.Author.Id == member.Id) &&
                              x.Content.Length < 2 && 
@@ -234,41 +208,35 @@ namespace MayoiBot
                     async Task Blue()
                     {                  
                         arr[n] = circle;
-                        string newmsg = arr.Aggregate("", (current, s) => current + s);
-                        await tic.ModifyAsync(newmsg);
+                        string newMsg = arr.Aggregate("", (current, s) => current + s);
+                        await tic.ModifyAsync(newMsg);
                     }
 
                     async Task Green()
                     {                  
                         arr[n] = cross;
-                        string newmsg = arr.Aggregate("", (current, s) => current + s);
-                        await tic.ModifyAsync(newmsg);
+                        string newMsg = arr.Aggregate("", (current, s) => current + s);
+                        await tic.ModifyAsync(newMsg);
                     }
 
                     async Task MoveTaken()
                     {
-                        var moveTakenMsg = await ctx.RespondAsync("This move has already been done! " + response.Result.Author.Mention);
+                        DiscordMessage moveTakenMsg = await ctx.RespondAsync("This move has already been done! " + response.Result.Author.Mention);
                         await Task.Delay(5000);
                         await response.Result.DeleteAsync("Move Taken | TTT");
                         await moveTakenMsg.DeleteAsync($"Move taken | TicTacToe move by {response.Result.Author.Username}");
                     }
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
+        
         [Command("ping")]
         [Aliases("p")]
         public async Task Ping(CommandContext ctx)
         {
-            var msg = await ctx.RespondAsync("Pinging!!!!???"); 
-            var info = DiscordEmoji.FromName(ctx.Client, ":information_source:");
-            var wsocket = ctx.Client.Ping;
-            var messageTime = msg.CreationTimestamp - ctx.Message.CreationTimestamp;
+            DiscordMessage msg = await ctx.RespondAsync("Pinging!!!!???"); 
+            DiscordEmoji info = DiscordEmoji.FromName(ctx.Client, ":information_source:");
+            int wsocket = ctx.Client.Ping;
+            TimeSpan messageTime = msg.CreationTimestamp - ctx.Message.CreationTimestamp;
             await msg.ModifyAsync(
                 info + " WebSocket ping took " + wsocket + " ms" +
                 "\n" + info + " Client ping took " + messageTime.Milliseconds + " ms" 
