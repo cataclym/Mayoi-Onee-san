@@ -6,7 +6,7 @@ namespace MayoiBot
     {
         public async Task Play(ulong player, int move)
         {
-            
+            return;
         }
     }
 }

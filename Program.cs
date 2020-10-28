@@ -1,6 +1,5 @@
 ﻿using DSharpPlus;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;

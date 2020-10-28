@@ -32,21 +32,18 @@ namespace MayoiBot
             {
                 Color = DiscordColor.White,
                 Title = ctx.Client.CurrentUser.Username + " bot info:",
-                Description =
-                    "This bot is open source and available on [GitHub](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!"
+                Description = "This bot is open source and available on [GitHub](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!",
             };
 
-            builder.AddField("Language", "C#", true);
-            builder.AddField(".NET wrapper", "[D#+](https://github.com/DSharpPlus/DSharpPlus/ 'DSharpPlus')", true);
+            builder.AddField("D-API .NET wrapper", "[D#+](https://github.com/DSharpPlus/DSharpPlus/ 'DSharpPlus')", true);
             builder.AddField("Author", "Cata", true);
             builder.WithImageUrl("https://dsharpplus.emzi0767.com/logo.png");
-            builder.WithThumbnail(
-                "https://cdn.discordapp.com/attachments/717045059215687691/735462333786095626/C_Sharp_logo.png");
 
             await ctx.RespondAsync(embed: builder);
         }
 
         [Command("random")]
+        [Aliases("rng")]
         public async Task Random(CommandContext ctx, int min = 0, int max = 100)
         {
             var number = new Random();
@@ -92,7 +89,7 @@ namespace MayoiBot
             {
                 Color = DiscordColor.Gold,
                 Title = "User info of **" + member.Username + "**#" + member.Discriminator,
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail {Url = member.AvatarUrl}
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail {Url = member.AvatarUrl},
             };
             emb.AddField("Displayname", member.DisplayName, true);
             emb.AddField("GuildOwner", $"{member.IsOwner}", true);
@@ -237,10 +234,12 @@ namespace MayoiBot
             DiscordEmoji info = DiscordEmoji.FromName(ctx.Client, ":information_source:");
             int wsocket = ctx.Client.Ping;
             TimeSpan messageTime = msg.CreationTimestamp - ctx.Message.CreationTimestamp;
-            await msg.ModifyAsync(
-                info + " WebSocket ping took " + wsocket + " ms" +
-                "\n" + info + " Client ping took " + messageTime.Milliseconds + " ms" 
-                );
+            DiscordEmbed embed = new DiscordEmbedBuilder()
+                .WithDescription(info + " WebSocket ping took " + wsocket + " ms" +
+                "\n" + info + " Client ping took " + messageTime.Milliseconds + " ms"
+            ).WithColor(DiscordColor.Green);
+
+            await msg.ModifyAsync(null, embed);
         }
     }
 }

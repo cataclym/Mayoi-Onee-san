@@ -16,17 +16,17 @@ namespace MayoiBot
         {
             [Command("bean")]
             [Aliases("ban")]
-            [RequireUserPermissions(Permissions.Administrator)]
+            [RequireUserPermissions(Permissions.BanMembers)]
             public async Task Bean (CommandContext ctx, DiscordMember member, [RemainingText]string reason = null)
             {
                 if (member.Id == ctx.Guild.Owner.Id) return;
-                const int arg = 0;
-                await member.BanAsync(arg, reason);
+                await member.BanAsync(0, reason);
                 await ctx.Channel.SendMessageAsync(member.Username + " was beaned!");
 
             }
             [Command("kick")]
-            [RequireUserPermissions(Permissions.Administrator)]
+            [Aliases("k")]
+            [RequireUserPermissions(Permissions.KickMembers)]
             public async Task Kick (CommandContext ctx, DiscordMember member, [RemainingText]string reason = null)
             {
                 if (member.Id == ctx.Guild.Owner.Id) return;
