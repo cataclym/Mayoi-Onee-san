@@ -1,41 +1,55 @@
-using System;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Net.Serialization;
 
 namespace MayoiBot 
     {
-        [Category("Moderation")]
-        [DSharpPlus.CommandsNext.Attributes.Description("Commands related to modding and administrating a server")]
         public class Moderation : BaseCommandModule
         {
             [Command("bean")]
             [Aliases("ban")]
+            [RequireBotPermissions(Permissions.BanMembers)]
             [RequireUserPermissions(Permissions.BanMembers)]
             public async Task Bean (CommandContext ctx, DiscordMember member, [RemainingText]string reason = null)
             {
-                if (member.Id == ctx.Guild.Owner.Id) return;
+                var authorRole = ctx.Member.Roles.FirstOrDefault();
+
+                if (member.Id == ctx.Guild.Owner.Id && (member.Roles.FirstOrDefault()?.Position.CompareTo(authorRole?.Position) < 0 )) {
+                    await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder()
+                        .WithColor(DiscordColor.Red)
+                        .WithDescription("You don't have permissions to ban this member.")
+                    );
+                }
                 await member.BanAsync(0, reason);
                 await ctx.Channel.SendMessageAsync(member.Username + " was beaned!");
 
             }
             [Command("kick")]
             [Aliases("k")]
+            [RequireBotPermissions(Permissions.KickMembers)]
             [RequireUserPermissions(Permissions.KickMembers)]
             public async Task Kick (CommandContext ctx, DiscordMember member, [RemainingText]string reason = null)
             {
-                if (member.Id == ctx.Guild.Owner.Id) return;
+                var authorRole = ctx.Member.Roles.FirstOrDefault();
+
+                if (member.Id == ctx.Guild.Owner.Id && (member.Roles.FirstOrDefault()?.Position.CompareTo(authorRole?.Position) < 0 )) {
+                    await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder()
+                        .WithColor(DiscordColor.Red)
+                        .WithDescription("You don't have permissions to kick this member.")
+                    );
+                }
                 await member.RemoveAsync(reason);
                 await ctx.Channel.SendMessageAsync(member.Username + " was kicked!");
             }
 
             [Command("destroy")]
-            [RequireUserPermissions(Permissions.Administrator)]
+            [RequireBotPermissions(Permissions.ManageRoles)]
+            [RequireUserPermissions(Permissions.ManageRoles)]
             public async Task Destroy(CommandContext ctx, DiscordRole dRole, [RemainingText]string reason = null)
             {
                 await dRole.DeleteAsync(reason);
@@ -43,7 +57,8 @@ namespace MayoiBot
             }
 
             [Command("destroy")]
-            [RequireUserPermissions(Permissions.Administrator)]
+            [RequireBotPermissions(Permissions.ManageChannels)]
+            [RequireUserPermissions(Permissions.ManageChannels)]
             public async Task Destroy(CommandContext ctx, DiscordChannel dChannel, [RemainingText]string reason = null)
             {
                 await dChannel.DeleteAsync(reason);

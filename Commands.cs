@@ -1,21 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Interactivity;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 
 namespace MayoiBot
 {
-    [Category("Commands")]
-    [DSharpPlus.CommandsNext.Attributes.Description("Commands for everyone")]
     [Cooldown(2, 4, CooldownBucketType.Guild)]
-
     public class Commands : BaseCommandModule
     {
         [Command("hi")]
@@ -28,16 +24,13 @@ namespace MayoiBot
         [Command("info")]
         public async Task Info(CommandContext ctx)
         {
-            var builder = new DiscordEmbedBuilder
-            {
-                Color = DiscordColor.White,
-                Title = ctx.Client.CurrentUser.Username + " bot info:",
-                Description = "This bot is open source and available on [GitHub](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!",
-            };
-
-            builder.AddField("D-API .NET wrapper", "[D#+](https://github.com/DSharpPlus/DSharpPlus/ 'DSharpPlus')", true);
-            builder.AddField("Author", "Cata", true);
-            builder.WithImageUrl("https://dsharpplus.emzi0767.com/logo.png");
+            var builder = new DiscordEmbedBuilder()
+                .WithColor(DiscordColor.Blurple)
+                .WithTitle(ctx.Client.CurrentUser.Username)
+                .WithDescription("This bot is open source and available on [GitHub](https://github.com/cataclym/Mayoi-Onee-san.git 'GitHub')!")
+                .AddField("D-API .NET wrapper", "[DSharpPlus](https://github.com/DSharpPlus/DSharpPlus/ 'DSharpPlus')", true)
+                .AddField("Author", "Cata", true)
+                .WithImageUrl("https://dsharpplus.emzi0767.com/logo.png");
 
             await ctx.RespondAsync(embed: builder);
         }
@@ -76,8 +69,7 @@ namespace MayoiBot
                 "I hope not!", "Yes... Maybe?", "Do you actually think that is possible??",
                 "I pity you for even asking."
             };
-            var randomNumber = new Random();
-            int number = randomNumber.Next(0, ebArray.Length);
+            int number = new Random().Next(0, ebArray.Length);
             await ctx.Channel.SendMessageAsync(ebArray[number]);
         }
         [Command("userinfo")]
@@ -107,39 +99,39 @@ namespace MayoiBot
         }
 
         [Command("tictactoe")]
+        [RequireGuild]
         [Aliases("ttt")]
-
         public async Task TicTacToe(CommandContext ctx, DiscordMember member)
         {
             DiscordEmoji circle = DiscordEmoji.FromName(ctx.Client, ":o:");
             DiscordEmoji cross = DiscordEmoji.FromName(ctx.Client, ":x:");
             DiscordEmoji agree = DiscordEmoji.FromName(ctx.Client, ":+1:");
-            DiscordEmoji disagree = DiscordEmoji.FromName(ctx.Client, ":-1:"); 
-            DiscordMessage x = await ctx.RespondAsync(embed: Embeds.TttEmbed);
-            Embeds.TttEmbed.WithDescription(member.Mention + " react with a 👍 to start game! Or 👎 to cancel.");
-            await x.CreateReactionAsync(agree).ConfigureAwait(false);
-            await x.CreateReactionAsync(disagree).ConfigureAwait(false);
+            DiscordEmoji disagree = DiscordEmoji.FromName(ctx.Client, ":-1:");
+            DiscordMessage message = await ctx.Channel.SendMessageAsync(embed: Embeds.SendTttReactEmbed(member)).ConfigureAwait(false);
+            await message.CreateReactionAsync(agree).ConfigureAwait(false);
+            await message.CreateReactionAsync(disagree).ConfigureAwait(false);
 
-            InteractivityResult<MessageReactionAddEventArgs> y = await x.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
-            if (y.Result?.Emoji == agree)
+            InteractivityResult<MessageReactionAddEventArgs> reactionAsync = await message.WaitForReactionAsync(member, TimeSpan.FromSeconds(45));
+            
+            if (reactionAsync.Result.Emoji.Name == agree.Name)
             {
-                await x.DeleteAllReactionsAsync();
-                await x.ModifyAsync(
+                await message.DeleteAllReactionsAsync();
+                await message.ModifyAsync(
                     "Let's begin!\nType numbers 1-9 to make a move\n" + 
-                    circle + " represents: " + member.Mention + " (This player begins)\n" +
-                    cross + " represents: " + ctx.Member.Mention,
+                    circle + " Represents: " + member.Mention + " & This player begins\n" +
+                    cross + " Represents: " + ctx.Member.Mention,
                     embed: null);
                 await TTT(ctx, member);
             }
-            else if (y.Result?.Emoji == disagree)
+            else if (reactionAsync.Result?.Emoji.Name == disagree.Name)
             {
-                await x.DeleteAllReactionsAsync();
-                await x.ModifyAsync(embed: Embeds.Cancelled);
+                await message.DeleteAllReactionsAsync();
+                await message.ModifyAsync(embed: Embeds.Cancelled);
             }
-            else
+            else if (reactionAsync.TimedOut)
             {
-                await x.DeleteAllReactionsAsync();
-                await x.ModifyAsync(embed: Embeds.TimeOut);
+                await message.DeleteAllReactionsAsync();
+                await message.ModifyAsync(embed: Embeds.TimeOut);
             }
         }
 
@@ -205,14 +197,14 @@ namespace MayoiBot
                     async Task Blue()
                     {                  
                         arr[n] = circle;
-                        string newMsg = arr.Aggregate("", (current, s) => current + s);
+                        string newMsg = arr.Aggregate("", (str, obj) => str + obj);
                         await tic.ModifyAsync(newMsg);
                     }
 
                     async Task Green()
                     {                  
                         arr[n] = cross;
-                        string newMsg = arr.Aggregate("", (current, s) => current + s);
+                        string newMsg = arr.Aggregate("", (str, obj) => str + obj);
                         await tic.ModifyAsync(newMsg);
                     }
 
